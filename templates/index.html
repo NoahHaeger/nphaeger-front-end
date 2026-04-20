@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}Salary Prediction App{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-body p-4 p-md-5">
+                <h1 class="text-center mb-4">Predict your salary using AI</h1>
+
+                {% if error %}
+                <div class="alert alert-danger text-center">
+                    {{ error }}
+                </div>
+                {% endif %}
+
+                {% if prediction is not none %}
+                <div class="alert alert-success text-center">
+                    <h4 class="mb-1">Predicted Salary</h4>
+                    <p class="fs-3 fw-bold mb-0">${{ "{:,.2f}".format(prediction|float) }}</p>
+                </div>
+                {% endif %}
+
+                <form action="/predict" method="POST" class="row g-3">
+
+                    <div class="col-md-6">
+                        <label for="age" class="form-label">Age Range:</label>
+                        <select class="form-select" id="age" name="age" required>
+                            <option value="">-- please choose your age --</option>
+                            <option value="18-21" {% if form_data.get('age') == '18-21' %}selected{% endif %}>18-21</option>
+                            <option value="22-24" {% if form_data.get('age') == '22-24' %}selected{% endif %}>22-24</option>
+                            <option value="25-29" {% if form_data.get('age') == '25-29' %}selected{% endif %}>25-29</option>
+                            <option value="30-34" {% if form_data.get('age') == '30-34' %}selected{% endif %}>30-34</option>
+                            <option value="35-39" {% if form_data.get('age') == '35-39' %}selected{% endif %}>35-39</option>
+                            <option value="40-44" {% if form_data.get('age') == '40-44' %}selected{% endif %}>40-44</option>
+                            <option value="45-49" {% if form_data.get('age') == '45-49' %}selected{% endif %}>45-49</option>
+                            <option value="50-54" {% if form_data.get('age') == '50-54' %}selected{% endif %}>50-54</option>
+                            <option value="55-59" {% if form_data.get('age') == '55-59' %}selected{% endif %}>55-59</option>
+                            <option value="60-69" {% if form_data.get('age') == '60-69' %}selected{% endif %}>60-69</option>
+                            <option value="70+" {% if form_data.get('age') == '70+' %}selected{% endif %}>70+</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="gender" class="form-label">Gender:</label>
+                        <select class="form-select" id="gender" name="gender" required>
+                            <option value="">-- please choose your gender --</option>
+                            <option value="Man" {% if form_data.get('gender') == 'Man' %}selected{% endif %}>Man</option>
+                            <option value="Woman" {% if form_data.get('gender') == 'Woman' %}selected{% endif %}>Woman</option>
+                            <option value="Nonbinary" {% if form_data.get('gender') == 'Nonbinary' %}selected{% endif %}>Nonbinary</option>
+                            <option value="Prefer not to say" {% if form_data.get('gender') == 'Prefer not to say' %}selected{% endif %}>Prefer not to say</option>
+                            <option value="Prefer to self-describe" {% if form_data.get('gender') == 'Prefer to self-describe' %}selected{% endif %}>Prefer to self-describe</option>
+                        </select>
+                    </div>
+
+                    <div class="col-12">
+                        <label for="country" class="form-label">Country:</label>
+                        <select class="form-select" id="country" name="country" required>
+                            <option value="">-- please choose your country --</option>
+                            <option value="United States of America" {% if form_data.get('country') == 'United States of America' %}selected{% endif %}>United States of America</option>
+                            <option value="Canada" {% if form_data.get('country') == 'Canada' %}selected{% endif %}>Canada</option>
+                            <option value="United Kingdom of Great Britain and Northern Ireland" {% if form_data.get('country') == 'United Kingdom of Great Britain and Northern Ireland' %}selected{% endif %}>United Kingdom</option>
+                            <option value="India" {% if form_data.get('country') == 'India' %}selected{% endif %}>India</option>
+                            <option value="Germany" {% if form_data.get('country') == 'Germany' %}selected{% endif %}>Germany</option>
+                            <option value="France" {% if form_data.get('country') == 'France' %}selected{% endif %}>France</option>
+                            <option value="Australia" {% if form_data.get('country') == 'Australia' %}selected{% endif %}>Australia</option>
+                            <option value="Brazil" {% if form_data.get('country') == 'Brazil' %}selected{% endif %}>Brazil</option>
+                            <option value="Mexico" {% if form_data.get('country') == 'Mexico' %}selected{% endif %}>Mexico</option>
+                            <option value="Other" {% if form_data.get('country') == 'Other' %}selected{% endif %}>Other</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="highest_deg" class="form-label">Highest Degree:</label>
+                        <select class="form-select" id="highest_deg" name="highest_deg" required>
+                            <option value="">-- please choose your education --</option>
+                            <option value="No formal education past high school" {% if form_data.get('highest_deg') == 'No formal education past high school' %}selected{% endif %}>No formal education past high school</option>
+                            <option value="Some college/university study without earning a bachelor’s degree" {% if form_data.get('highest_deg') == 'Some college/university study without earning a bachelor’s degree' %}selected{% endif %}>Some college/university study without earning a bachelor’s degree</option>
+                            <option value="Bachelor’s degree" {% if form_data.get('highest_deg') == 'Bachelor’s degree' %}selected{% endif %}>Bachelor’s degree</option>
+                            <option value="Master’s degree" {% if form_data.get('highest_deg') == 'Master’s degree' %}selected{% endif %}>Master’s degree</option>
+                            <option value="Doctoral degree" {% if form_data.get('highest_deg') == 'Doctoral degree' %}selected{% endif %}>Doctoral degree</option>
+                            <option value="Professional doctorate" {% if form_data.get('highest_deg') == 'Professional doctorate' %}selected{% endif %}>Professional doctorate</option>
+                            <option value="I prefer not to answer" {% if form_data.get('highest_deg') == 'I prefer not to answer' %}selected{% endif %}>I prefer not to answer</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="code_experience" class="form-label">Coding Experience:</label>
+                        <select class="form-select" id="code_experience" name="code_experience" required>
+                            <option value="">-- please choose your experience --</option>
+                            <option value="< 1 years" {% if form_data.get('code_experience') == '< 1 years' %}selected{% endif %}>&lt; 1 years</option>
+                            <option value="1-3 years" {% if form_data.get('code_experience') == '1-3 years' %}selected{% endif %}>1-3 years</option>
+                            <option value="3-5 years" {% if form_data.get('code_experience') == '3-5 years' %}selected{% endif %}>3-5 years</option>
+                            <option value="5-10 years" {% if form_data.get('code_experience') == '5-10 years' %}selected{% endif %}>5-10 years</option>
+                            <option value="10-20 years" {% if form_data.get('code_experience') == '10-20 years' %}selected{% endif %}>10-20 years</option>
+                            <option value="20+ years" {% if form_data.get('code_experience') == '20+ years' %}selected{% endif %}>20+ years</option>
+                            <option value="I have never written code" {% if form_data.get('code_experience') == 'I have never written code' %}selected{% endif %}>I have never written code</option>
+                        </select>
+                    </div>
+
+                    <div class="col-12">
+                        <label for="current_title" class="form-label">Current Title:</label>
+                        <select class="form-select" id="current_title" name="current_title" required>
+                            <option value="">-- please choose your current title --</option>
+                            <option value="Data Administrator" {% if form_data.get('current_title') == 'Data Administrator' %}selected{% endif %}>Data Administrator</option>
+                            <option value="Data Analyst (Business, Marketing, Financial, Quantitative, etc)" {% if form_data.get('current_title') == 'Data Analyst (Business, Marketing, Financial, Quantitative, etc)' %}selected{% endif %}>Data Analyst</option>
+                            <option value="Data Architect" {% if form_data.get('current_title') == 'Data Architect' %}selected{% endif %}>Data Architect</option>
+                            <option value="Data Engineer" {% if form_data.get('current_title') == 'Data Engineer' %}selected{% endif %}>Data Engineer</option>
+                            <option value="Data Scientist" {% if form_data.get('current_title') == 'Data Scientist' %}selected{% endif %}>Data Scientist</option>
+                            <option value="Developer Advocate" {% if form_data.get('current_title') == 'Developer Advocate' %}selected{% endif %}>Developer Advocate</option>
+                            <option value="Engineer (non-software)" {% if form_data.get('current_title') == 'Engineer (non-software)' %}selected{% endif %}>Engineer (non-software)</option>
+                            <option value="Machine Learning/ MLops Engineer" {% if form_data.get('current_title') == 'Machine Learning/ MLops Engineer' %}selected{% endif %}>Machine Learning / MLops Engineer</option>
+                            <option value="Manager (Program, Project, Operations, Executive-level, etc)" {% if form_data.get('current_title') == 'Manager (Program, Project, Operations, Executive-level, etc)' %}selected{% endif %}>Manager</option>
+                            <option value="Research Scientist" {% if form_data.get('current_title') == 'Research Scientist' %}selected{% endif %}>Research Scientist</option>
+                            <option value="Software Engineer" {% if form_data.get('current_title') == 'Software Engineer' %}selected{% endif %}>Software Engineer</option>
+                            <option value="Statistician" {% if form_data.get('current_title') == 'Statistician' %}selected{% endif %}>Statistician</option>
+                            <option value="Teacher / professor" {% if form_data.get('current_title') == 'Teacher / professor' %}selected{% endif %}>Teacher / professor</option>
+                            <option value="Other" {% if form_data.get('current_title') == 'Other' %}selected{% endif %}>Other</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="company_size" class="form-label">Company Size:</label>
+                        <select class="form-select" id="company_size" name="company_size" required>
+                            <option value="">-- please choose your company size --</option>
+                            <option value="0-49 employees" {% if form_data.get('company_size') == '0-49 employees' %}selected{% endif %}>0-49 employees</option>
+                            <option value="50-249 employees" {% if form_data.get('company_size') == '50-249 employees' %}selected{% endif %}>50-249 employees</option>
+                            <option value="250-999 employees" {% if form_data.get('company_size') == '250-999 employees' %}selected{% endif %}>250-999 employees</option>
+                            <option value="1000-9,999 employees" {% if form_data.get('company_size') == '1000-9,999 employees' %}selected{% endif %}>1000-9,999 employees</option>
+                            <option value="10,000 or more employees" {% if form_data.get('company_size') == '10,000 or more employees' %}selected{% endif %}>10,000 or more employees</option>
+                        </select>
+                    </div>
+
+                    <div class="col-12 d-grid mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">Predict my Salary</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
